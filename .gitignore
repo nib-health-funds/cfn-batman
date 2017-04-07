@@ -1,0 +1,4 @@
+.serverless
+node_modules
+npm-debug.log
+assume-role-output.txt

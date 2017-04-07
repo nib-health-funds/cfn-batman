@@ -1,0 +1,54 @@
+service: nib-batman 
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+
+
+  region: ap-southeast-2
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "*"
+      Resource: "*"
+
+functions:
+  cleanupStacks:
+    handler: handler.cleanupStacks
+    timeout: 45
+    events:
+      - schedule: rate(1 day)
+  cleanupBranch:
+    handler: branch.delete
+    timeout: 45
+    events:
+      - http:
+          path: branch/delete
+          method: post
+  dryRun:
+    handler: dryRun.test
+    timeout: 45
+    events:
+      - http: 
+          path: dryRun
+          method: get
+
+resources: 
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Batman
+        AttributeDefinitions:
+          - AttributeName: Date
+            AttributeType: S
+          - AttributeName: StackName
+            AttributeType: S
+        KeySchema:
+          - AttributeName: StackName
+            KeyType: HASH
+          - AttributeName: Date
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
