@@ -46,11 +46,12 @@ npm deploy
 
 
 ## Authors
-* Shea Kelly
+* [Shea Kelly](https://github.com/sheakelly)
 * Klee Thomas
-* Will Falconer
+* [Will Falconer](https://github.com/willfalconer)
 * Laurie Jones
 * Mark Kemper
 * Kurt Gardiner
-* Sam Jeffress
+* [Sam Jeffress](https://github.com/samjeffress)
+* [Matthew Turner](https://github.com/ramesius)
 
