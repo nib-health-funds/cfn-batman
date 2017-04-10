@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/nib-health-funds/batman.svg?branch=master)](https://travis-ci.org/nib-health-funds/batman)
+
 ![batman](https://mi-od-live-s.legocdn.com/r/www/r/catalogs/-/media/catalogs/characters/dc/mugshots/mugshot%202016/76055_1to1_mf_mugshot_batman_01.png?l.r2=1858676167)
 
 Batman scours your AWS stack for villianous stacks and using genius intellect, physical prowess, martial arts abilities, detective skills, science and technology, vast wealth, intimidation, and indomitable will keeps the cloudy street safe and clean.
