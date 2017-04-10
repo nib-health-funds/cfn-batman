@@ -41,3 +41,14 @@ npm deploy
 ## Built With
 
 * [serverless framework](!https://serverless.com/)
+
+
+## Authors
+* Shea Kelly
+* Klee Thomas
+* Will Falconer
+* Laurie Jones
+* Mark Kemper
+* Kurt Gardiner
+* Sam Jeffress
+
