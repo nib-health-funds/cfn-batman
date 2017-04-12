@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/nib-health-funds/batman.svg?branch=master)](https://travis-ci.org/nib-health-funds/batman)
+[![Build Status](https://travis-ci.org/nib-health-funds/cfn-batman.svg?branch=master)](https://travis-ci.org/nib-health-funds/cfn-batman)
 
 ![batman](https://mi-od-live-s.legocdn.com/r/www/r/catalogs/-/media/catalogs/characters/dc/mugshots/mugshot%202016/76055_1to1_mf_mugshot_batman_01.png?l.r2=1858676167)
 
