@@ -5,7 +5,7 @@
   "main": "handler.js",
   "scripts": {
     "deploy": "node_modules/serverless/bin/serverless deploy --verbose",
-    "test": "mocha \"cleanup/*.test.js\""
+    "test": "mocha \"src/*.test.js\""
   },
   "repository": {
     "type": "git",
