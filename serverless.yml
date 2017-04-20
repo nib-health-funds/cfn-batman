@@ -3,6 +3,8 @@ service: nib-batman
 provider:
   name: aws
   runtime: nodejs4.3
+  environment:
+    BRANCH_KEY: slice
 
 
   region: ap-southeast-2

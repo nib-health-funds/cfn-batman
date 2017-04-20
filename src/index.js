@@ -6,7 +6,7 @@ var moment = require('moment');
 
 var cloudformation = new AWS.CloudFormation();
 
-var batmanTag = {Key: 'Batman'};
+var batmanTagKey = 'Batman';
 
 function cleanupStacks(dryRun) {
   console.log("In Clean UP Stacks");
@@ -108,15 +108,15 @@ function filterStacksByStatus(stacksArray) {
 
 function findNonMasterStacks(stacksArray) {
   var nonMasterStacks = _.filter(stacksArray, stack => {
-    var sliceTags = _.filter(stack.Tags, {Key: 'Slice'});
-    if(sliceTags.length == 0) {
+    var branchTag = _.filter(stack.Tags, (tag) => {return tag.Key.toLowerCase() == process.env.BRANCH_KEY.toLowerCase()});
+    if(branchTag.length == 0) {
       // check if there are any tags at all - this might be an Elastic Beanstalk app!
       if (stack.Tags.length === 0) {
         return isStackNonMasterElasticBeanstalk(stack);
       }
       return false;
     }
-    return sliceTags[0].Value.toLowerCase() != 'master';
+    return branchTag[0].Value.toLowerCase() != 'master';
   });
   return nonMasterStacks;
 }
@@ -140,8 +140,7 @@ function getOldStacks(stacksArray) {
 function ignoreStacksWithBatmanTag(stacksArray) {
   console.log(stacksArray)
   var stacksWithoutBatmanTag = _.filter(stacksArray, stack => {
-    var batmanTags = _.filter(stack.Tags, batmanTag);
-    return batmanTags.length === 0;
+    return batmanTagFilter(stack.Tags).length === 0;
   });
   console.log(stacksWithoutBatmanTag);
   return stacksWithoutBatmanTag
@@ -149,10 +148,13 @@ function ignoreStacksWithBatmanTag(stacksArray) {
 
 function getBatmanStacks(stacksArray) {
   var stacksWithoutBatmanTag = _.filter(stacksArray, stack => {
-    var batmanTags = _.filter(stack.Tags, batmanTag);
-    return batmanTags.length > 0;
+    return batmanTagFilter(stack.Tags).length > 0;
   });
   return stacksWithoutBatmanTag
+}
+
+function batmanTagFilter(stackTags) {
+  return _.filter(stackTags, (tag) => {return tag.Key.toLowerCase() == batmanTagKey.toLowerCase()});
 }
 
 function stacksWithRepoAndBranchName(stacksArray, repositoryName, branchName) {
