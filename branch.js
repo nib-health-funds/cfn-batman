@@ -1,14 +1,19 @@
 'use strict';
 
-var AWS = require('aws-sdk');
-var {deleteFromGitBranch} = require('./src');
-var dynamo = require('./src/dynamo.js');
+const AWS = require('aws-sdk');
+const {deleteFromGitBranch} = require('./src');
+const dynamo = require('./src/dynamo.js');
+const {isVerifiedRequest} = require('./src/githubVerification');
 
 module.exports.delete = (event, context, callback) => {
   console.log('deleting a branch...');
   console.log(JSON.stringify(event));
   console.log(JSON.stringify(context));
-  var body = JSON.parse(event.body);
+  const body = JSON.parse(event.body);
+
+  if (!isVerifiedRequest(event))
+    return callback({error: 'X-Hub-Signature does not match calculated signature'}, null);
+
   deleteFromGitBranch(body)
     .then(stacksForCleaning => dynamo.writeRecords(stacksForCleaning.deleted))
     .then(dynamo => {

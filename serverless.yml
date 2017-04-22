@@ -3,7 +3,8 @@ service: nib-batman
 provider:
   name: aws
   runtime: nodejs4.3
-
+  environment:
+    GITHUB_SECRET: ${env:GITHUB_SECRET}
 
   region: ap-southeast-2
   iamRoleStatements:
