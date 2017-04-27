@@ -4,11 +4,10 @@
 
 Batman scours your AWS stack for villianous stacks and using genius intellect, physical prowess, martial arts abilities, detective skills, science and technology, vast wealth, intimidation, and indomitable will keeps the cloudy street safe and clean.
 # How do I let Batman know I'm doing good? 
-If you want to keep a stack safe from being killed by Batman add a `Batman` tag to your cloudformation stack, no need to have any content. 
+If you want to keep a stack safe from being killed by Batman add a `Batman` tag to your cloudformation stack (`{Key:'Batman'}`), no need to have any content. 
 
 Batman inspect the tags on your cloudformation stacks to determine what to shut down, specifically looking for the tag
-Key: Slice
-Value: !master
+`{Key: 'slice', Value: 'anything-other-than-master'}`
 
 Batman can also receive a bat signal (commonly known as a Github webhook) to delete stacks. Suggested usage is to receive a webhook when a branch is deleted so Batman can cleanup.
 
@@ -16,9 +15,10 @@ Batman can also receive a bat signal (commonly known as a Github webhook) to del
 ## Getting Started
 
 Edit [serverless.yml](serverless.yml) where you can adjust
-* scheduled run time,
+* scheduled run time
+* tag that contains your branch name (default = Slice)
 * if your project will accept webhooks
-* AWS region,
+* AWS region
 * anything else which takes your fancy.
 
 

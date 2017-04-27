@@ -4,6 +4,7 @@ var proxyquire = require('proxyquire');
 var sinon = require('sinon');
 
 var masterStackName = 'Master Tagged Stack';
+process.env.BRANCH_KEY = 'Slice';
 
 function assertDeletedStacksResponse(deletableStackNames) {
   // assert our master stack isn't listed in the return set
