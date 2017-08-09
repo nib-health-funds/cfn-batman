@@ -18,7 +18,8 @@ function assertDeletedStacksResponse(deletableStackNames) {
   assert(deletableStackNames.mercyShown.indexOf('Tagged Batman Not Deleted') > -1);
   assert(deletedStacks.indexOf('Delete Me') > -1);
   assert(deletedStacks.indexOf('Try deleting failed again') > -1);
-  assert.equal(deletedStacks.length, 3);
+  assert(deletedStacks.indexOf('Try deleting young failed') > -1);
+  assert.equal(deletedStacks.length, 5);
 }
 
 
@@ -31,7 +32,7 @@ describe('Cleanup', function() {
       console.log('Shown Mercy: ', deletableStackNames.mercyShown);
       assertDeletedStacksResponse(deletableStackNames);
       assert(deleteStacksStub.called);
-      assert(deleteStacksStub.calledWith(sinon.match({ StackName: 'Delete Me'}, { StackName: 'Try deleting failed again'}, { StackName: 'elastic-beanstalk-another-branch'})));
+      assert(deleteStacksStub.calledWith(sinon.match({ StackName: 'Delete Me'}, { StackName: 'Try deleting failed again'}, { StackName: 'elastic-beanstalk-another-branch'}, { StackName: 'Try deleting young failed'})));
       done();
     }).catch(err => {
       console.log('errors');
@@ -144,6 +145,15 @@ var mocks = {
           }],
           Outputs: [],
           LastUpdatedTime: moment().add(-8, 'days')
+        },{
+          StackName: 'Try deleting young failed',
+          StackStatus: 'DELETE_FAILED',
+          Tags: [{
+            Key: 'Slice',
+            Value: 'non master'
+          }],
+          Outputs: [],
+          LastUpdatedTime: moment().add(-2, 'days')
         },{
           StackName: 'Do not delete me',
           StackStatus: 'UPDATE_IN_PROGRESS',
