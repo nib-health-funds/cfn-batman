@@ -21,7 +21,7 @@ function cleanupStacks(dryRun) {
       var withStatuses = filterStacksByStatus(oldNonMasterStacks);
       var notBatmanTag = ignoreStacksWithBatmanTag(withStatuses);
       batmanTaggedStacks = getBatmanStacks(withStatuses);
-      return notBatmanTag;
+      return notBatmanTag.concat(getDeleteFailedStacks(allStacks));
     })
     .then(filteredStacks => {
       console.log('filteredStacks', filteredStacks);
@@ -102,6 +102,13 @@ function listAllStacks(token, stackArray, resolve, reject) {
 function filterStacksByStatus(stacksArray) {
   return _.filter(stacksArray, stack => {
     var statuses = ["CREATE_COMPLETE", "UPDATE_COMPLETE", "DELETE_FAILED"];
+    return statuses.indexOf(stack.StackStatus) >= 0;
+  });
+}
+
+function getDeleteFailedStacks(stacksArray) {
+  return _.filter(stacksArray, stack => {
+    var statuses = ["DELETE_FAILED"];
     return statuses.indexOf(stack.StackStatus) >= 0;
   });
 }
