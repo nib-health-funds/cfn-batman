@@ -5,8 +5,7 @@ provider:
   runtime: nodejs6.10
   environment:
     GITHUB_SECRET: ${env:GITHUB_SECRET}
-    BRANCH_KEY: slice
-
+    
   region: ap-southeast-2
   iamRoleStatements:
     - Effect: "Allow"

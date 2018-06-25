@@ -2,9 +2,9 @@ var assert = require('assert');
 var moment = require('moment');
 var proxyquire = require('proxyquire');
 var sinon = require('sinon');
+var config = require('../config')
 
 var masterStackName = 'Master Tagged Stack';
-process.env.BRANCH_KEY = 'Slice';
 
 function assertDeletedStacksResponse(deletableStackNames) {
   // assert our master stack isn't listed in the return set
@@ -20,7 +20,6 @@ function assertDeletedStacksResponse(deletableStackNames) {
   assert(deletedStacks.indexOf('Try deleting failed again') > -1);
   assert.equal(deletedStacks.length, 3);
 }
-
 
 describe('Cleanup', function() {
   it('should remove appropriate stacks', function(done) {
@@ -106,7 +105,7 @@ var mocks = {
           StackName: 'Master Tagged Stack',
           StackStatus: 'CREATE_COMPLETE',
           Tags: [{
-            Key: 'Slice',
+            Key: config.branchKey,
             Value: 'Master'
           }],
           Outputs: [],
@@ -121,7 +120,7 @@ var mocks = {
           StackName: 'Non Master New Stack',
           StackStatus: 'CREATE_COMPLETE',
           Tags: [{
-            Key: 'Slice',
+            Key: config.branchKey,
             Value: 'non master'
           }],
           Outputs: [],
@@ -130,7 +129,7 @@ var mocks = {
           StackName: 'Delete Me',
           StackStatus: 'CREATE_COMPLETE',
           Tags: [{
-            Key: 'Slice',
+            Key: config.branchKey,
             Value: 'non master'
           }],
           Outputs: [],
@@ -139,7 +138,7 @@ var mocks = {
           StackName: 'Try deleting failed again',
           StackStatus: 'DELETE_FAILED',
           Tags: [{
-            Key: 'Slice',
+            Key: config.branchKey,
             Value: 'non master'
           }],
           Outputs: [],
@@ -148,7 +147,7 @@ var mocks = {
           StackName: 'Do not delete me',
           StackStatus: 'UPDATE_IN_PROGRESS',
           Tags: [{
-            Key: 'Slice',
+            Key: config.branchKey,
             Value: 'non master'
           }],
           Outputs: [],
@@ -157,7 +156,7 @@ var mocks = {
           StackName: 'Tagged Batman Not Deleted',
           StackStatus: 'CREATE_COMPLETE',
           Tags: [{
-            Key: 'Slice',
+            Key: config.branchKey,
             Value: 'non master'
           },{
             Key: 'Batman',
@@ -169,7 +168,7 @@ var mocks = {
           StackName: 'branch-name-repo-name',
           StackStatus: 'CREATE_COMPLETE',
           Tags: [{
-            Key: 'Slice',
+            Key: config.branchKey,
             Value: 'non master'
           },{
             Key: 'Batman',
