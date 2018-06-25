@@ -1,14 +1,14 @@
-var assert = require('assert');
-var moment = require('moment');
-var proxyquire = require('proxyquire');
-var sinon = require('sinon');
+const assert = require('assert');
+const moment = require('moment');
+const proxyquire = require('proxyquire');
+const sinon = require('sinon');
 
-var masterStackName = 'Master Tagged Stack';
+const masterStackName = 'Master Tagged Stack';
 process.env.BRANCH_KEY = 'Slice';
 
 function assertDeletedStacksResponse(deletableStackNames) {
   // assert our master stack isn't listed in the return set
-  var deletedStacks = deletableStackNames.deleted;
+  const deletedStacks = deletableStackNames.deleted;
   assert.equal(deletedStacks.indexOf(masterStackName), -1);
   assert.equal(deletedStacks.indexOf('Non Master New Stack'), -1);
   assert.equal(deletedStacks.indexOf('UnTagged Stack'), -1);
@@ -25,7 +25,7 @@ function assertDeletedStacksResponse(deletableStackNames) {
 describe('Cleanup', function() {
   it('should remove appropriate stacks', function(done) {
     deleteStacksStub.reset();
-    var cleanup = proxyquire("./index.js", mocks);
+    const cleanup = proxyquire("./index.js", mocks);
     cleanup.cleanupStacks().then(deletableStackNames  => {
       console.log('Deleted: ', deletableStackNames.deleted);
       console.log('Shown Mercy: ', deletableStackNames.mercyShown);
@@ -42,7 +42,7 @@ describe('Cleanup', function() {
 
   it('shouldnt invoke deleteStacks when dry run true', function(done) {
     deleteStacksStub.reset();
-    var cleanup = proxyquire("./index.js", mocks);
+    const cleanup = proxyquire("./index.js", mocks);
     cleanup.cleanupStacks(true).then(deletableStackNames  => {
       console.log('Deleted: ', deletableStackNames.deleted);
       console.log('Shown Mercy: ', deletableStackNames.mercyShown);
@@ -60,8 +60,8 @@ describe('Cleanup', function() {
 describe('Branch delete', function() {
   it('should find the stack and delete it', function(done) {
     deleteStacksStub.reset();
-    var cleanup = proxyquire("./index.js", mocks);
-    var gitDeleteBranchObject = {
+    const cleanup = proxyquire("./index.js", mocks);
+    const gitDeleteBranchObject = {
       ref: 'branch-name',
       repository: { 
         name: 'repo-name'
@@ -69,7 +69,7 @@ describe('Branch delete', function() {
     };
     cleanup.deleteFromGitBranch(gitDeleteBranchObject).then(deletedBranchStatus  => {
       // mock aws passing back a list of stacks
-      var deletedStacks = deletedBranchStatus.deleted;
+      const deletedStacks = deletedBranchStatus.deleted;
       console.log('Deleted: ', deletedBranchStatus.deleted);
       console.log('Shown Mercy: ', deletedBranchStatus.mercyShown);
 
@@ -89,14 +89,14 @@ describe('Branch delete', function() {
   });
 });
 
-var promisableDeleteStack = {
+const promisableDeleteStack = {
   promise: function() {
     return Promise.resolve({ ResponseMetadata: { RequestId: '3797470f-bb69-11e6-90e4-19b39eb619f7'}});
   }
 };
 
-var deleteStacksStub = sinon.stub().returns(promisableDeleteStack);
-var mocks = {
+const deleteStacksStub = sinon.stub().returns(promisableDeleteStack);
+const mocks = {
   "aws-sdk":{
     CloudFormation: function(){
       this.deleteStack = deleteStacksStub;

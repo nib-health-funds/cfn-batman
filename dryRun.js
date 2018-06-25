@@ -1,6 +1,6 @@
 'use strict';
 
-var {cleanupStacks} = require('./src');
+const {cleanupStacks} = require('./src');
 
 module.exports.test = (event, context, callback) => {
   cleanupStacks(true)

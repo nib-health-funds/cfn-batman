@@ -1,8 +1,8 @@
 'use strict';
 
-var AWS = require('aws-sdk');
-var {cleanupStacks} = require('./src');
-var dynamo = require('./src/dynamo.js');
+const AWS = require('aws-sdk');
+const {cleanupStacks} = require('./src');
+const dynamo = require('./src/dynamo.js');
 
 module.exports.cleanupStacks = (event, context, callback) => {
   console.log('running some awesome logic');

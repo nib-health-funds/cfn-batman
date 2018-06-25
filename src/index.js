@@ -1,72 +1,57 @@
 'use strict';
 
-var AWS = require('aws-sdk');
-var _ = require('lodash');
-var moment = require('moment');
+const AWS = require('aws-sdk');
+const _ = require('lodash');
+const moment = require('moment');
 
-var cloudformation = new AWS.CloudFormation();
+const cloudformation = new AWS.CloudFormation();
 
-var batmanTagKey = 'Batman';
+const batmanTagKey = 'Batman';
 
-function cleanupStacks(dryRun) {
+const cleanupStacks = async dryRun => {
   console.log("In Clean UP Stacks");
 
-  var batmanTaggedStacks = [];
+  const allStacks = await listAllStacksWrapper()
+  console.log("allStacks", allStacks.length);
+  const nonMasterStacks = findNonMasterStacks(allStacks);
+  const oldNonMasterStacks = getOldStacks(nonMasterStacks);
+  const withStatuses = filterStacksByStatus(oldNonMasterStacks);
+  const filteredStacks = ignoreStacksWithBatmanTag(withStatuses);
+  const batmanTaggedStacks = getBatmanStacks(withStatuses);
+  console.log('filteredStacks', filteredStacks);
 
-  return listAllStacksWrapper()
-    .then(allStacks => {
-      console.log("allStacks", allStacks.length);
-      var nonMasterStacks = findNonMasterStacks(allStacks);
-      var oldNonMasterStacks = getOldStacks(nonMasterStacks);
-      var withStatuses = filterStacksByStatus(oldNonMasterStacks);
-      var notBatmanTag = ignoreStacksWithBatmanTag(withStatuses);
-      batmanTaggedStacks = getBatmanStacks(withStatuses);
-      return notBatmanTag;
-    })
-    .then(filteredStacks => {
-      console.log('filteredStacks', filteredStacks);
-      console.log(filteredStacks);
-      return deleteStacks(filteredStacks, dryRun);
-    })
-    .then(deletedStacks => {
-      console.log('deletedStacks', deletedStacks);
-      var stackNames = deletedStacks.map(stack => stack.StackName).sort();
-      console.log('Stack names: ', stackNames);
-      return {
-        deleted: stackNames, 
-        mercyShown: batmanTaggedStacks.map(stack => stack.StackName).sort()
-      }
-    });
+  const deletedStacks = await deleteStacks(filteredStacks, dryRun);
+  console.log('deletedStacks', deletedStacks);
+  const stackNames = deletedStacks.map(stack => stack.StackName).sort();
+  console.log('Stack names: ', stackNames);
+  return {
+    deleted: stackNames, 
+    mercyShown: batmanTaggedStacks.map(stack => stack.StackName).sort()
+  }
 }
 
-function deleteFromGitBranch(branchDeleteInformation) {
+const deleteFromGitBranch = async (branchDeleteInformation) => {
   console.log(branchDeleteInformation);
-  return listAllStacksWrapper()
-    .then(allStacks => {
-      var nonMasterStacks = findNonMasterStacks(allStacks);
-      var foundStack = stacksWithRepoAndBranchName(nonMasterStacks, branchDeleteInformation.repository.name, branchDeleteInformation.ref);
-      return foundStack;
-    })
-    .then(filteredStacks => {
-      console.log('found stack', filteredStacks);
-      return deleteStacks(filteredStacks);
-    })
-    .then(deletedStacks => {
-      console.log('deletedStacks', deletedStacks);
-      var stackNames = deletedStacks.map(stack => stack.StackName).sort();
-      console.log('Stack names: ', stackNames);
-      return {
-        deleted: stackNames, 
-        mercyShown: []
-      }
-    });
+  const allStacks = await listAllStacksWrapper()
+  const nonMasterStacks = findNonMasterStacks(allStacks);
+  const foundStack = stacksWithRepoAndBranchName(nonMasterStacks, branchDeleteInformation.repository.name, branchDeleteInformation.ref);
+
+  console.log('found stack', foundStack);
+  const deletedStacks = await deleteStacks(foundStack);
+  console.log('deletedStacks', deletedStacks);
+  const stackNames = deletedStacks.map(stack => stack.StackName).sort();
+  console.log('Stack names: ', stackNames);
+  return {
+    deleted: stackNames, 
+    mercyShown: []
+  }
 }
 
-function deleteStacks(stacks, dryRun) {
+const deleteStacks = async (stacks, dryRun) => {
   if (dryRun)
-    return Promise.resolve(stacks);
+    return stacks;
 
-  var deleteAllTheThings = stacks.map(stack => {
+  const deleteAllTheThings = stacks.map(stack => {
     return cloudformation.deleteStack({StackName: stack.StackName}).promise();
   });
 
@@ -78,21 +63,21 @@ function deleteStacks(stacks, dryRun) {
   });
 }
 
-function listAllStacksWrapper() {
+const listAllStacksWrapper = async () => {
   return new Promise((resolve, reject) => {
     return listAllStacks(null, [], resolve, reject);
   });
 }
 
-function listAllStacks(token, stackArray, resolve, reject) {
+const listAllStacks = async (token, stackArray, resolve, reject) => {
   console.log('getting stacks.....');
-  var params = {NextToken: token};
+  const params = {NextToken: token};
   cloudformation.describeStacks(params, (err, data) => {
     if(err) {
       console.error("ERROR: ", err);
       return reject(err);
     }
-    var stacks = stackArray.concat(data.Stacks);
+    const stacks = stackArray.concat(data.Stacks);
     if(!data.NextToken)
       return resolve(stacks);
     return listAllStacks(data.NextToken, stacks, resolve, reject);
@@ -101,14 +86,14 @@ function listAllStacks(token, stackArray, resolve, reject) {
 
 function filterStacksByStatus(stacksArray) {
   return _.filter(stacksArray, stack => {
-    var statuses = ["CREATE_COMPLETE", "UPDATE_COMPLETE", "DELETE_FAILED"];
+    const statuses = ["CREATE_COMPLETE", "UPDATE_COMPLETE", "DELETE_FAILED"];
     return statuses.indexOf(stack.StackStatus) >= 0;
   });
 }
 
 function findNonMasterStacks(stacksArray) {
-  var nonMasterStacks = _.filter(stacksArray, stack => {
-    var branchTag = _.filter(stack.Tags, (tag) => {return tag.Key.toLowerCase() == process.env.BRANCH_KEY.toLowerCase()});
+  const nonMasterStacks = _.filter(stacksArray, stack => {
+    const branchTag = _.filter(stack.Tags, (tag) => {return tag.Key.toLowerCase() == process.env.BRANCH_KEY.toLowerCase()});
     if(branchTag.length == 0) {
       // check if there are any tags at all - this might be an Elastic Beanstalk app!
       if (stack.Tags.length === 0) {
@@ -125,29 +110,29 @@ function isStackNonMasterElasticBeanstalk(stack) {
   if (stack.StackName.toLowerCase().indexOf('master') > -1) {
     return false;
   }
-  var containsBeanstalkOutput = _.filter(stack.Outputs, ['Description', 'Beanstalk Service Role'])
+  const containsBeanstalkOutput = _.filter(stack.Outputs, ['Description', 'Beanstalk Service Role'])
   return containsBeanstalkOutput.length > 0;
 }
 
 function getOldStacks(stacksArray) {
   return _.filter(stacksArray, stack => {
-    var mostRecentChange = stack.LastUpdatedTime ? stack.LastUpdatedTime : stack.CreationTime;
-    var daysOld = moment(new Date()).diff(mostRecentChange, 'days', false);
+    const mostRecentChange = stack.LastUpdatedTime ? stack.LastUpdatedTime : stack.CreationTime;
+    const daysOld = moment(new Date()).diff(mostRecentChange, 'days', false);
     return daysOld > 7;
   });
 }
 
 function ignoreStacksWithBatmanTag(stacksArray) {
   console.log(stacksArray)
-  var stacksWithoutBatmanTag = _.filter(stacksArray, stack => {
+  const stacksWithoutBatmanTag = _.filter(stacksArray, stack => {
     return batmanTagFilter(stack.Tags).length === 0;
   });
   console.log(stacksWithoutBatmanTag);
   return stacksWithoutBatmanTag
 }
 
-function getBatmanStacks(stacksArray) {
-  var stacksWithoutBatmanTag = _.filter(stacksArray, stack => {
+const getBatmanStacks = stacksArray => {
+  const stacksWithoutBatmanTag = _.filter(stacksArray, stack => {
     return batmanTagFilter(stack.Tags).length > 0;
   });
   return stacksWithoutBatmanTag
@@ -158,10 +143,10 @@ function batmanTagFilter(stackTags) {
 }
 
 function stacksWithRepoAndBranchName(stacksArray, repositoryName, branchName) {
-  var stacksWithRepoAndBranchName = _.filter(stacksArray, stack => {
-    var stackNameLower = stack.StackName.toLowerCase();
-    var repositoryNameLower = repositoryName.toLowerCase();
-    var branchNameLower = branchName.toLowerCase();
+  const stacksWithRepoAndBranchName = _.filter(stacksArray, stack => {
+    const stackNameLower = stack.StackName.toLowerCase();
+    const repositoryNameLower = repositoryName.toLowerCase();
+    const branchNameLower = branchName.toLowerCase();
 
     return stackNameLower.indexOf(repositoryNameLower) > -1 && stackNameLower.indexOf(branchNameLower) > -1;
   });

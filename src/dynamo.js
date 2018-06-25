@@ -1,13 +1,13 @@
 'use strict';
 
-var AWS = require("aws-sdk");
-var moment = require('moment');
-var dynamo = new AWS.DynamoDB();
-var tableName = "Batman";
+const AWS = require("aws-sdk");
+const moment = require('moment');
+const dynamo = new AWS.DynamoDB();
+const tableName = "Batman";
 
 function putItem(deleteDate, deltedStackName) {
   return new Promise((resolve, reject) => {
-    var params = {
+    const params = {
       TableName: tableName,
       Item: {
         "StackName": {S: deltedStackName},
@@ -30,10 +30,10 @@ function putItem(deleteDate, deltedStackName) {
   });
 }
 
-var writeRecords = function(deletedStackNames) {
+const writeRecords = function(deletedStackNames) {
   console.log('creating records...')
-  var nowUtcString = moment().utc().format();
-  var writeToDynamoPromises = deletedStackNames.map(stackName => putItem(nowUtcString, stackName));
+  const nowUtcString = moment().utc().format();
+  const writeToDynamoPromises = deletedStackNames.map(stackName => putItem(nowUtcString, stackName));
   return Promise.all(writeToDynamoPromises);
 }
 
