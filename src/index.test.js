@@ -100,100 +100,105 @@ const mocks = {
   "aws-sdk":{
     CloudFormation: function(){
       this.deleteStack = deleteStacksStub;
-      this.describeStacks = function(params, callback){
+      this.describeStacks = function(params){
         console.log("IN THE MOCK");
-        callback(null, {NextToken:null, Stacks:[{
-          StackName: 'Master Tagged Stack',
-          StackStatus: 'CREATE_COMPLETE',
-          Tags: [{
-            Key: 'Slice',
-            Value: 'Master'
-          }],
-          Outputs: [],
-          LastUpdatedTime: moment().add(-8, 'days')
-        },{
-          StackName: 'UnTagged Stack',
-          StackStatus: 'CREATE_COMPLETE',
-          Tags: [],
-          Outputs: [],
-          LastUpdatedTime: moment().add(-8, 'days')
-        },{
-          StackName: 'Non Master New Stack',
-          StackStatus: 'CREATE_COMPLETE',
-          Tags: [{
-            Key: 'Slice',
-            Value: 'non master'
-          }],
-          Outputs: [],
-          LastUpdatedTime: moment().add(-6, 'days')
-        },{
-          StackName: 'Delete Me',
-          StackStatus: 'CREATE_COMPLETE',
-          Tags: [{
-            Key: 'Slice',
-            Value: 'non master'
-          }],
-          Outputs: [],
-          LastUpdatedTime: moment().add(-8, 'days')
-        },{
-          StackName: 'Try deleting failed again',
-          StackStatus: 'DELETE_FAILED',
-          Tags: [{
-            Key: 'Slice',
-            Value: 'non master'
-          }],
-          Outputs: [],
-          LastUpdatedTime: moment().add(-8, 'days')
-        },{
-          StackName: 'Do not delete me',
-          StackStatus: 'UPDATE_IN_PROGRESS',
-          Tags: [{
-            Key: 'Slice',
-            Value: 'non master'
-          }],
-          Outputs: [],
-          LastUpdatedTime: moment().add(-8, 'days')
-        },{
-          StackName: 'Tagged Batman Not Deleted',
-          StackStatus: 'CREATE_COMPLETE',
-          Tags: [{
-            Key: 'Slice',
-            Value: 'non master'
+        return { promise: () => {
+        return {
+          NextToken:null, 
+          Stacks:[{
+            StackName: 'Master Tagged Stack',
+            StackStatus: 'CREATE_COMPLETE',
+            Tags: [{
+              Key: 'Slice',
+              Value: 'Master'
+            }],
+            Outputs: [],
+            LastUpdatedTime: moment().add(-8, 'days')
           },{
-            Key: 'Batman',
-            Value: 'doesnt matter'
-          }],
-          Outputs: [],
-          LastUpdatedTime: moment().add(-8, 'days')
-        },{
-          StackName: 'branch-name-repo-name',
-          StackStatus: 'CREATE_COMPLETE',
-          Tags: [{
-            Key: 'Slice',
-            Value: 'non master'
+            StackName: 'UnTagged Stack',
+            StackStatus: 'CREATE_COMPLETE',
+            Tags: [],
+            Outputs: [],
+            LastUpdatedTime: moment().add(-8, 'days')
           },{
-            Key: 'Batman',
-            Value: 'doesnt matter'
-          }],
-          Outputs: [],
-          LastUpdatedTime: moment().add(-2, 'days')
-        },{
-          StackName: 'elastic-beanstalk-master',
-          StackStatus: 'CREATE_COMPLETE',
-          Tags: [],
-          Outputs: [
-            {Key: 'ServiceRole', Description: 'Beanstalk Service Role'}
-          ],
-          LastUpdatedTime: moment().add(-8, 'days')
-        },{
-          StackName: 'elastic-beanstalk-another-branch',
-          StackStatus: 'CREATE_COMPLETE',
-          Tags: [],
-          LastUpdatedTime: moment().add(-8, 'days'),
-          Outputs: [
-            {Key: 'ServiceRole', Description: 'Beanstalk Service Role'}
-          ]
-        }]});
+            StackName: 'Non Master New Stack',
+            StackStatus: 'CREATE_COMPLETE',
+            Tags: [{
+              Key: 'Slice',
+              Value: 'non master'
+            }],
+            Outputs: [],
+            LastUpdatedTime: moment().add(-6, 'days')
+          },{
+            StackName: 'Delete Me',
+            StackStatus: 'CREATE_COMPLETE',
+            Tags: [{
+              Key: 'Slice',
+              Value: 'non master'
+            }],
+            Outputs: [],
+            LastUpdatedTime: moment().add(-8, 'days')
+          },{
+            StackName: 'Try deleting failed again',
+            StackStatus: 'DELETE_FAILED',
+            Tags: [{
+              Key: 'Slice',
+              Value: 'non master'
+            }],
+            Outputs: [],
+            LastUpdatedTime: moment().add(-8, 'days')
+          },{
+            StackName: 'Do not delete me',
+            StackStatus: 'UPDATE_IN_PROGRESS',
+            Tags: [{
+              Key: 'Slice',
+              Value: 'non master'
+            }],
+            Outputs: [],
+            LastUpdatedTime: moment().add(-8, 'days')
+          },{
+            StackName: 'Tagged Batman Not Deleted',
+            StackStatus: 'CREATE_COMPLETE',
+            Tags: [{
+              Key: 'Slice',
+              Value: 'non master'
+            },{
+              Key: 'Batman',
+              Value: 'doesnt matter'
+            }],
+            Outputs: [],
+            LastUpdatedTime: moment().add(-8, 'days')
+          },{
+            StackName: 'branch-name-repo-name',
+            StackStatus: 'CREATE_COMPLETE',
+            Tags: [{
+              Key: 'Slice',
+              Value: 'non master'
+            },{
+              Key: 'Batman',
+              Value: 'doesnt matter'
+            }],
+            Outputs: [],
+            LastUpdatedTime: moment().add(-2, 'days')
+          },{
+            StackName: 'elastic-beanstalk-master',
+            StackStatus: 'CREATE_COMPLETE',
+            Tags: [],
+            Outputs: [
+              {Key: 'ServiceRole', Description: 'Beanstalk Service Role'}
+            ],
+            LastUpdatedTime: moment().add(-8, 'days')
+          },{
+            StackName: 'elastic-beanstalk-another-branch',
+            StackStatus: 'CREATE_COMPLETE',
+            Tags: [],
+            LastUpdatedTime: moment().add(-8, 'days'),
+            Outputs: [
+              {Key: 'ServiceRole', Description: 'Beanstalk Service Role'}
+            ]
+          }]
+        }
+      }}
       };
     }
   }};

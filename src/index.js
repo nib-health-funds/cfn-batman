@@ -11,7 +11,7 @@ const batmanTagKey = 'Batman';
 const cleanupStacks = async dryRun => {
   console.log("In Clean UP Stacks");
 
-  const allStacks = await listAllStacksWrapper()
+  const allStacks = await listAllStacks(null, [])
   console.log("allStacks", allStacks.length);
   const nonMasterStacks = findNonMasterStacks(allStacks);
   const oldNonMasterStacks = getOldStacks(nonMasterStacks);
@@ -32,7 +32,7 @@ const cleanupStacks = async dryRun => {
 
 const deleteFromGitBranch = async (branchDeleteInformation) => {
   console.log(branchDeleteInformation);
-  const allStacks = await listAllStacksWrapper()
+  const allStacks = await listAllStacks(null, [])
   const nonMasterStacks = findNonMasterStacks(allStacks);
   const foundStack = stacksWithRepoAndBranchName(nonMasterStacks, branchDeleteInformation.repository.name, branchDeleteInformation.ref);
 
@@ -63,25 +63,14 @@ const deleteStacks = async (stacks, dryRun) => {
   });
 }
 
-const listAllStacksWrapper = async () => {
-  return new Promise((resolve, reject) => {
-    return listAllStacks(null, [], resolve, reject);
-  });
-}
-
-const listAllStacks = async (token, stackArray, resolve, reject) => {
+const listAllStacks = async (token, stackArray) => {
   console.log('getting stacks.....');
-  const params = {NextToken: token};
-  cloudformation.describeStacks(params, (err, data) => {
-    if(err) {
-      console.error("ERROR: ", err);
-      return reject(err);
-    }
-    const stacks = stackArray.concat(data.Stacks);
-    if(!data.NextToken)
-      return resolve(stacks);
-    return listAllStacks(data.NextToken, stacks, resolve, reject);
-  });
+  const params = { NextToken: token };
+  const data = await cloudformation.describeStacks(params).promise()
+  const stacks = stackArray.concat(data.Stacks);
+  if(!data.NextToken)
+    return stacks;
+  return listAllStacks(data.NextToken, stacks);
 }
 
 function filterStacksByStatus(stacksArray) {
