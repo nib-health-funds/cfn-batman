@@ -63,7 +63,7 @@ const deleteStacks = async (stacks, dryRun) => {
   });
 }
 
-const listAllStacks = async (token, stackArray) => {
+const listAllStacks = (token, stackArray) => {
   console.log('getting stacks.....');
   const params = { NextToken: token };
   const data = await cloudformation.describeStacks(params).promise()
